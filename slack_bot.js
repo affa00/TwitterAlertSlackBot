@@ -71,6 +71,14 @@ if (!process.env.token) {
 
 var Botkit = require('./lib/Botkit.js');
 var os = require('os');
+var twitter = require('twitter');
+
+var client = new twitter({
+    consumer_key: process.env.ckey,
+    consumer_secret: process.env.csec,
+    access_token_key: process.env.tkey,
+    access_token_secret: process.env.tsec
+});
 
 var controller = Botkit.slackbot({
     debug: true,
@@ -79,6 +87,22 @@ var controller = Botkit.slackbot({
 var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
+
+
+client.stream( 'statuses/filter', { track : '@tqs298' }, function( stream) {
+   
+    stream.on( 'data', function( data ) {
+	var id_str = data.id_str;
+	var name = data.user.screen_name;
+	var str = 'https://twitter.com/'+ name + '/status/'  + id_str;
+	bot.say({
+	    text: str,
+	    channel: '#twitter',
+	    username: 'tqs_twitter'
+	
+	});
+    });
+});
 
 
 controller.hears(['hello', 'hi'], 'direct_message,direct_mention,mention', function(bot, message) {

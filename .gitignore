@@ -1,2 +1,5 @@
 *.md
 node_modules/
+.*~
+*.*~
+*.sh
